@@ -1,0 +1,40 @@
+ package com.amandris.clients.web.benchmark;
+ 
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.IOException;
+ 
+ import javax.servlet.ServletException;
+ import javax.servlet.http.HttpServlet;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ 
+ /**
+  * Benchmark case CWE-22. picture is appended to the pictures directory and then opened.
+  */
+ public class CWE22_PathTraversalServlet extends HttpServlet {
+ 
+ 	private static final long serialVersionUID = 1L;
+ 
+ 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ 		String picture = request.getParameter("picture");
+ 		File file = new File("C:/amandris/pictures/" + picture);
++        String normalizedPath = file.getCanonicalPath();
++        if (!normalizedPath.startsWith(new File("C:/amandris/pictures/").getCanonicalPath())) {
++            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file path");
++            return;
++        }
++
+ 		FileInputStream input = new FileInputStream(file);
+ 		try {
+ 			response.setContentType("application/octet-stream");
+ 			byte[] buffer = new byte[4096];
+ 			int read;
+ 			while ((read = input.read(buffer)) != -1) {
+ 				response.getOutputStream().write(buffer, 0, read);
+ 			}
+ 		} finally {
+ 			input.close();
+ 		}
+ 	}
+ }
