@@ -1,0 +1,45 @@
+ package com.amandris.clients.web.benchmark;
+ 
++import java.util.Map;
++import java.util.HashMap;
++import javax.xml.namespace.QName;
+ import java.io.IOException;
+ import java.io.StringReader;
+ 
+ import javax.servlet.ServletException;
+ import javax.servlet.http.HttpServlet;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ import javax.xml.xpath.XPath;
+ import javax.xml.xpath.XPathFactory;
+ 
+ import org.xml.sax.InputSource;
+ 
+ /**
+  * Benchmark case CWE-643. login is concatenated into an XPath query.
+  */
+ public class CWE643_XpathInjectionServlet extends HttpServlet {
+ 
+ 	private static final long serialVersionUID = 1L;
+ 
+ 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ 		String login = request.getParameter("login");
+ 		String xml = "<buyers><buyer><login>ada</login><email>ada@amandris.example</email></buyer></buyers>";
+ 		try {
+ 			XPath xpath = XPathFactory.newInstance().newXPath();
+-			String email = xpath.evaluate(
+-				"/buyers/buyer[login/text()='" + login + "']/email/text()",
+-				new InputSource(new StringReader(xml)));
++            Map<QName, String> variables = new HashMap<>();
++            variables.put(new QName("login"), login);
++            xpath.setXPathVariableResolver(variableName -> variables.get(variableName));
++            String email = xpath.evaluate(
++                "/buyers/buyer[login/text()=$login]/email/text()",
++                new InputSource(new StringReader(xml)));
+ 			response.setContentType("text/plain");
+ 			response.getWriter().write(email);
+ 		} catch (Exception exception) {
+ 			throw new ServletException(exception);
+ 		}
+ 	}
+ }
