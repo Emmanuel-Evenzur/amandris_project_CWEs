@@ -33,7 +33,7 @@ Detected by the Mend CLI
 | CWE-113 | HTTP Header Injection | Low | `CWE113_ResponseSplittingServlet` copies `buyerName` into a response header. `/benchmark/header` |
 | CWE-117 | Log Forging | Low | `CWE117_LogInjectionServlet` logs the `comment` parameter. `/benchmark/log` |
 | CWE-134 | Unsafe Format String | High | `CWE134_FormatStringServlet` uses `template` as a format string. `/benchmark/format` |
-| CWE-319 | Insufficient Transport Layer Protection | Medium | `CWE319_CleartextTransmissionServlet` posts the password to `http://auth.amandris.example/login` and sends the card number on port 80. `/benchmark/cleartext-send` |
+| CWE-319 | Insufficient Transport Layer Protection | Medium | `CWE319_CleartextTransmissionServlet` posts the buyer password to `http://auth.amandris.example/login`. `/benchmark/cleartext-send` |
 | CWE-325 | Missing Cryptographic Step | Low | `CWE325_LowIterationPasswordHashServlet` hashes a password with PBKDF2 using one iteration. `/benchmark/password-hash` |
 | CWE-327 | Insecure Cryptographic Algorithm | Medium | `CWE327_BrokenCryptoServlet` encrypts a card number with DES. `/benchmark/cipher` |
 | CWE-328 | Weak Hash Strength | Low | `CWE328_WeakHashServlet` digests profile text with MD5. `/benchmark/hash` |
@@ -57,10 +57,11 @@ The same scan also reports CWE-327 on `CWE325_LowIterationPasswordHashServlet` (
 Agentic SAST cases
 ------------------
 
-These four cases are in the suite for agentic SAST. The Mend CLI scan above did not report them.
+These cases are in the suite for agentic SAST. The Mend CLI scan reported CWE-319 and did not report the other four.
 
 | CWE | Case |
 | --- | --- |
+| CWE-319 | `CWE319_CleartextTransmissionServlet` posts the buyer password to `http://auth.amandris.example/login`. `/benchmark/cleartext-send` |
 | CWE-312 | `CWE312_CleartextStorageServlet` saves the buyer password in a `password` column and appends the card number to a text file. `/benchmark/cleartext-storage` |
 | CWE-306 | `CWE306_MissingAuthenticationServlet` deletes a buyer account from `buyerId` and does not read the session. `/benchmark/delete-account` |
 | CWE-639 | `CWE639_IdorMessageServlet` requires a logged-in buyer, then returns the private message selected by `messageId` without comparing that message's owner to the session buyer. `/benchmark/message` |
